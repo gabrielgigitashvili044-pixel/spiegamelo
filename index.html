@@ -1,0 +1,205 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Spiegamelo</title>
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 44 44'%3E%3Crect width='44' height='44' rx='12' fill='%23FFE01B'/%3E%3Cpath d='M8 15.5L22 24L36 15.5' stroke='%2327241D' stroke-width='2.6' stroke-linecap='round' stroke-linejoin='round'/%3E%3Crect x='8' y='13' width='28' height='19' rx='3' stroke='%2327241D' stroke-width='2.6' fill='none'/%3E%3Ccircle cx='31' cy='14' r='7' fill='%232F9E68'/%3E%3Cpath d='M28 14L30 16.5L34.5 11.5' stroke='white' stroke-width='2.2' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E" />
+<meta property="og:title" content="Spiegamelo — Understand any official letter" />
+<meta property="og:description" content="Take a photo of an official letter and we'll tell you what it is and what to do." />
+<meta property="og:type" content="website" />
+<meta property="og:url" content="https://spiegamelo.vercel.app/" />
+<meta property="og:image" content="https://spiegamelo.vercel.app/spiegamelo-link-preview.png" />
+<meta property="og:image:width" content="1200" />
+<meta property="og:image:height" content="630" />
+<meta name="twitter:card" content="summary_large_image" />
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600;9..144,700&family=Manrope:wght@400;500;600;700&display=swap" rel="stylesheet" />
+<style>
+  :root{
+    --bg:#FFFCF4; --card:#FFFFFF; --ink:#27241D; --muted:#6F6A5E;
+    --line:#EFEADF; --yellow:#FFE01B; --yellow-deep:#F5C400;
+    --green:#2F9E68; --amber:#E39A12; --red:#DB5A5A;
+    --radius:20px; --shadow:0 12px 34px rgba(39,36,29,0.09);
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{font-family:'Manrope',system-ui,sans-serif;background:var(--bg);color:var(--ink);font-size:18px;line-height:1.6;-webkit-font-smoothing:antialiased}
+  .wrap{max-width:680px;margin:0 auto;padding:0 22px}
+  header{padding:26px 0 8px;display:flex;align-items:center;gap:10px;justify-content:center}
+  .logo{display:flex;align-items:center;gap:10px}
+  .logo svg{flex-shrink:0}
+  .logo .wordmark{font-family:'Fraunces',serif;font-weight:700;font-size:26px;letter-spacing:-.5px;color:var(--ink)}
+  .logo .wordmark span{background:var(--yellow);padding:0 7px;border-radius:8px}
+  .hero{text-align:center;padding:40px 0 14px}
+  h1{font-family:'Fraunces',serif;font-weight:600;font-size:clamp(33px,7.5vw,52px);line-height:1.08;letter-spacing:-1px;margin-bottom:18px}
+  .hero p{font-size:clamp(18px,4.2vw,21px);color:var(--muted);max-width:520px;margin:0 auto 30px}
+  .uploader{background:var(--card);border:1.5px solid var(--line);border-radius:var(--radius);box-shadow:var(--shadow);padding:26px 24px 30px;text-align:center}
+  .langpick{display:flex;align-items:center;justify-content:center;gap:9px;margin-bottom:22px;flex-wrap:wrap}
+  .langpick label{font-size:15px;color:var(--muted);font-weight:600}
+  .langpick select{font-family:'Manrope',sans-serif;font-size:16px;font-weight:600;color:var(--ink);background:#FFFBEC;border:1.5px solid var(--line);border-radius:12px;padding:11px 14px;cursor:pointer;max-width:240px}
+  .btn{display:inline-flex;align-items:center;justify-content:center;gap:10px;background:var(--yellow);color:var(--ink);border:none;border-radius:16px;font-family:'Manrope',sans-serif;font-weight:700;font-size:20px;padding:18px 30px;cursor:pointer;width:100%;max-width:340px;transition:.15s;box-shadow:0 4px 0 var(--yellow-deep)}
+  .btn:hover{transform:translateY(-1px)}
+  .btn:active{transform:translateY(3px);box-shadow:0 1px 0 var(--yellow-deep)}
+  .btn.ghost{background:transparent;box-shadow:none;color:var(--muted);font-weight:600;font-size:16px;text-decoration:underline;padding:12px;margin-top:6px}
+  .hint{color:var(--muted);font-size:15px;margin-top:14px}
+  textarea{width:100%;min-height:150px;border:1.5px solid var(--line);border-radius:14px;padding:14px;font-family:'Manrope',sans-serif;font-size:17px;color:var(--ink);resize:vertical;margin-bottom:14px}
+  .hidden{display:none}
+  .steps{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin:34px 0 10px}
+  .step{text-align:center;padding:6px}
+  .step .ico{font-size:34px;display:block;margin-bottom:8px}
+  .step b{display:block;font-size:16px;font-weight:700}
+  .step small{color:var(--muted);font-size:14px}
+  @media(max-width:560px){.steps{grid-template-columns:1fr;gap:18px}.step{display:flex;gap:14px;text-align:left;align-items:center}.step .ico{margin:0;font-size:30px}}
+  .loading{text-align:center;padding:50px 20px}
+  .spin{width:46px;height:46px;border:5px solid var(--line);border-top-color:var(--yellow-deep);border-radius:50%;margin:0 auto 18px;animation:r 1s linear infinite}
+  @keyframes r{to{transform:rotate(360deg)}}
+  .result{background:var(--card);border:1.5px solid var(--line);border-radius:var(--radius);box-shadow:var(--shadow);overflow:hidden}
+  .strip{height:8px;background:var(--amber)}
+  .strip.alta{background:var(--red)} .strip.media{background:var(--amber)} .strip.bassa{background:var(--green)}
+  .result .body{padding:26px 24px}
+  .rtitle{font-family:'Fraunces',serif;font-weight:600;font-size:26px;line-height:1.15;margin-bottom:4px}
+  .urg{display:inline-block;font-size:13px;font-weight:700;padding:4px 12px;border-radius:20px;margin-bottom:20px}
+  .urg.alta{background:#FCE6E6;color:#B33} .urg.media{background:#FCF0D8;color:#9A6A00} .urg.bassa{background:#E2F3E9;color:#1F7A4D}
+  .row{padding:16px 0;border-top:1px solid var(--line)}
+  .row:first-of-type{border-top:none}
+  .row .lab{display:flex;align-items:center;gap:8px;font-weight:700;font-size:15px;color:var(--muted);text-transform:uppercase;letter-spacing:.4px;margin-bottom:5px}
+  .row .val{font-size:18px}
+  .big{font-family:'Fraunces',serif;font-size:22px;font-weight:600}
+  .again{margin:22px 0 4px}
+  .disclaimer{text-align:center;color:var(--muted);font-size:13.5px;padding:30px 10px 26px;max-width:520px;margin:0 auto}
+  footer{text-align:center;color:var(--muted);font-size:14px;padding:14px 0 40px}
+  .err{background:#FCE6E6;color:#B33;border-radius:14px;padding:16px;font-weight:600;margin-top:16px}
+</style>
+</head>
+<body>
+  <header><div class="logo">
+    <svg width="44" height="44" viewBox="0 0 44 44" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <rect width="44" height="44" rx="12" fill="#FFE01B"/>
+      <path d="M8 15.5L22 24L36 15.5" stroke="#27241D" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"/>
+      <rect x="8" y="13" width="28" height="19" rx="3" stroke="#27241D" stroke-width="2.6" fill="none"/>
+      <circle cx="31" cy="14" r="7" fill="#2F9E68"/>
+      <path d="M28 14L30 16.5L34.5 11.5" stroke="white" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/>
+    </svg>
+    <div class="wordmark">Spiega<span>melo</span></div>
+  </div></header>
+  <div class="wrap">
+    <section id="start">
+      <div class="hero">
+        <h1 data-i18n="h1"></h1>
+        <p data-i18n="sub"></p>
+      </div>
+      <div class="uploader">
+        <div class="langpick">
+          <label for="lang" data-i18n="langlabel"></label>
+          <select id="lang">
+            <option value="auto" data-i18n="autolang"></option>
+            <option value="Italian">Italiano</option>
+            <option value="English">English</option>
+            <option value="Romanian">Română</option>
+            <option value="Albanian">Shqip</option>
+            <option value="Arabic">العربية</option>
+            <option value="Ukrainian">Українська</option>
+            <option value="Russian">Русский</option>
+            <option value="Georgian">ქართული</option>
+            <option value="Chinese">中文</option>
+            <option value="Spanish">Español</option>
+            <option value="French">Français</option>
+            <option value="Portuguese">Português</option>
+            <option value="German">Deutsch</option>
+            <option value="Hindi">हिन्दी</option>
+            <option value="Bengali">বাংলা</option>
+            <option value="Urdu">اردو</option>
+            <option value="Tagalog">Tagalog</option>
+            <option value="Polish">Polski</option>
+          </select>
+        </div>
+        <button class="btn" id="pick" data-i18n="pick"></button>
+        <div class="hint" data-i18n="hint"></div>
+        <input type="file" id="file" accept="image/*" capture="environment" class="hidden" />
+        <button class="btn ghost" id="toggleText" data-i18n="toggle"></button>
+        <div id="textBox" class="hidden" style="margin-top:16px">
+          <textarea id="text" data-i18n-ph="ph"></textarea>
+          <button class="btn" id="sendText" data-i18n="send"></button>
+        </div>
+        <div id="error"></div>
+      </div>
+      <div class="steps">
+        <div class="step"><span class="ico">📷</span><div><b data-i18n="s1t"></b><small data-i18n="s1s"></small></div></div>
+        <div class="step"><span class="ico">🔎</span><div><b data-i18n="s2t"></b><small data-i18n="s2s"></small></div></div>
+        <div class="step"><span class="ico">✅</span><div><b data-i18n="s3t"></b><small data-i18n="s3s"></small></div></div>
+      </div>
+    </section>
+    <section id="loader" class="hidden">
+      <div class="loading"><div class="spin"></div><div class="big" data-i18n="loadt"></div><p style="color:var(--muted);margin-top:8px" data-i18n="loads"></p></div>
+    </section>
+    <section id="out" class="hidden">
+      <div class="result">
+        <div class="strip" id="strip"></div>
+        <div class="body">
+          <div class="rtitle" id="rTitle"></div>
+          <div class="urg" id="rUrg"></div>
+          <div class="row"><div class="lab" data-i18n="labWhat"></div><div class="val" id="rWhat"></div></div>
+          <div class="row"><div class="lab" data-i18n="labDo"></div><div class="val" id="rDo"></div></div>
+          <div class="row" id="rowAmount"><div class="lab" data-i18n="labAmount"></div><div class="val big" id="rAmount"></div></div>
+          <div class="row"><div class="lab" data-i18n="labWhen"></div><div class="val big" id="rWhen"></div></div>
+          <div class="row"><div class="lab" data-i18n="labHow"></div><div class="val" id="rHow"></div></div>
+        </div>
+      </div>
+      <button class="btn again" id="reset" data-i18n="reset"></button>
+    </section>
+    <p class="disclaimer" data-i18n="disc"></p>
+    <footer data-i18n="foot"></footer>
+  </div>
+<script>
+  const T = {
+    it:{ title:"Spiegamelo — Capisci ogni lettera ufficiale",
+      h1:"Hai ricevuto una lettera che non capisci?",
+      sub:"Falle una foto. Ti spieghiamo cos'è, cosa devi fare ed entro quando — in parole semplici.",
+      langlabel:"Spiegami in:", autolang:"🌐 Automatico (come la lettera)",
+      pick:"📷 Carica la lettera", hint:"Gratis · Nessuna registrazione · Bastano 10 secondi",
+      toggle:"oppure scrivi il testo a mano", ph:"Scrivi qui cosa dice la lettera...", send:"Spiegamela",
+      s1t:"1. Fai una foto", s1s:"alla tua lettera", s2t:"2. La leggiamo", s2s:"noi per te", s3t:"3. Ti diciamo", s3s:"cosa devi fare",
+      loadt:"Sto leggendo la tua lettera...", loads:"Un momento di pazienza",
+      labWhat:"📄 Cos'è questa lettera", labDo:"✅ Cosa devi fare", labAmount:"💶 Importo da pagare", labWhen:"⏰ Entro quando", labHow:"📍 Come fare",
+      reset:"📷 Carica un'altra lettera",
+      disc:"Spiegamelo ti aiuta a capire la tua lettera, ma non sostituisce un consiglio legale o fiscale ufficiale. In caso di dubbio, rivolgiti a un professionista o all'ufficio competente.",
+      foot:"Fatto con cura · Spiegamelo",
+      urg:{alta:"⚠️ Urgente",media:"🟡 Importante",bassa:"🟢 Nessuna fretta"},
+      err:{photo:"Non riesco a leggere la foto. Riprova.",short:"Scrivi qualche parola in più.",wrong:"Qualcosa è andato storto. Riprova tra poco.",noread:"Non sono riuscito a leggere la lettera. Prova con una foto più chiara.",conn:"Connessione assente. Controlla internet e riprova."} },
+    en:{ title:"Spiegamelo — Understand any official letter",
+      h1:"Got a letter you don't understand?",
+      sub:"Take a photo. We'll tell you what it is, what to do, and by when — in plain words.",
+      langlabel:"Explain it in:", autolang:"🌐 Automatic (same as letter)",
+      pick:"📷 Upload your letter", hint:"Free · No sign-up · Takes 10 seconds",
+      toggle:"or type the text instead", ph:"Type what the letter says here...", send:"Explain it",
+      s1t:"1. Take a photo", s1s:"of your letter", s2t:"2. We read it", s2s:"for you", s3t:"3. We tell you", s3s:"what to do",
+      loadt:"Reading your letter...", loads:"Just a moment",
+      labWhat:"📄 What this letter is", labDo:"✅ What to do", labAmount:"💶 Amount to pay", labWhen:"⏰ By when", labHow:"📍 How to do it",
+      reset:"📷 Upload another letter",
+      disc:"Spiegamelo helps you understand your letter, but it is not official legal or tax advice. When in doubt, ask a professional or the relevant office.",
+      foot:"Made with care · Spiegamelo",
+      urg:{alta:"⚠️ Urgent",media:"🟡 Important",bassa:"🟢 No rush"},
+      err:{photo:"Couldn't read the photo. Please try again.",short:"Please type a few more words.",wrong:"Something went wrong. Please try again shortly.",noread:"Couldn't read the letter. Try a clearer photo.",conn:"No connection. Check your internet and try again."} }
+  };
+  const lang = (navigator.language||'en').toLowerCase().startsWith('it') ? 'it' : 'en';
+  const t = T[lang];
+  document.documentElement.lang = lang;
+  document.title = t.title;
+  document.querySelectorAll('[data-i18n]').forEach(el=>{ const k=el.dataset.i18n; if(t[k]!=null) el.textContent=t[k]; });
+  document.querySelectorAll('[data-i18n-ph]').forEach(el=>{ const k=el.dataset.i18nPh; if(t[k]!=null) el.placeholder=t[k]; });
+
+  const $ = id => document.getElementById(id);
+  const show = (...ids) => { ['start','loader','out'].forEach(s=>$(s).classList.add('hidden')); ids.forEach(i=>$(i).classList.remove('hidden')); };
+  $('pick').onclick = () => $('file').click();
+  $('toggleText').onclick = () => $('textBox').classList.toggle('hidden');
+  $('reset').onclick = () => { $('file').value=''; $('text').value=''; $('error').innerHTML=''; show('start'); };
+  $('file').onchange = async e => { const f=e.target.files[0]; if(!f) return; try{ const b64=await resize(f); analyze({image:b64,mediaType:'image/jpeg'}); }catch(err){ fail(t.err.photo); } };
+  $('sendText').onclick = () => { const x=$('text').value.trim(); if(x.length<5){ fail(t.err.short); return; } analyze({text:x}); };
+  function resize(file){ return new Promise((res,rej)=>{ const img=new Image(); img.onload=()=>{ const max=1568; let w=img.width,h=img.height; if(w>h&&w>max){h=h*max/w;w=max;} else if(h>max){w=w*max/h;h=max;} const c=document.createElement('canvas'); c.width=w; c.height=h; c.getContext('2d').drawImage(img,0,0,w,h); res(c.toDataURL('image/jpeg',0.85).split(',')[1]); }; img.onerror=rej; const fr=new FileReader(); fr.onload=()=>img.src=fr.result; fr.onerror=rej; fr.readAsDataURL(file); }); }
+  function fail(msg){ $('error').innerHTML='<div class="err">'+msg+'</div>'; show('start'); }
+  async function analyze(payload){ payload.answerLang=$('lang').value; show('loader'); try{ const r=await fetch('/api/analyze',{method:'POST',headers:{'content-type':'application/json'},body:JSON.stringify(payload)}); const data=await r.json(); if(data.error){ fail(t.err.wrong); return; } if(data.result){ render(data.result); } else if(data.raw){ render({titolo:'',cosa_e:data.raw,cosa_fare:'—',scadenza:'—',come_fare:'—',urgenza:'media',importo:'—'}); } else fail(t.err.noread); }catch(e){ fail(t.err.conn); } }
+  function render(d){ const u=(d.urgenza||'media').toLowerCase(); $('strip').className='strip '+u; $('rTitle').textContent=d.titolo||''; $('rUrg').className='urg '+u; $('rUrg').textContent=t.urg[u]||t.urg.media; $('rWhat').textContent=d.cosa_e||'—'; $('rDo').textContent=d.cosa_fare||'—'; $('rWhen').textContent=d.scadenza||'—'; $('rHow').textContent=d.come_fare||'—'; const amt=(d.importo||'').trim(); if(amt&&amt!=='—'){ $('rAmount').textContent=amt; $('rowAmount').style.display='block'; } else $('rowAmount').style.display='none'; show('out'); window.scrollTo({top:0,behavior:'smooth'}); }
+</script>
+</body>
+</html>
