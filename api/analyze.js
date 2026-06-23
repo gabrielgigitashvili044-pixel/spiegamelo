@@ -6,7 +6,7 @@ export default async function handler(req, res) {
 
   try {
     const body = typeof req.body === 'string' ? JSON.parse(req.body) : req.body;
-    const { image, mediaType, text } = body || {};
+    const { image, mediaType, text, answerLang } = body || {};
 
     let userContent;
     if (image) {
@@ -20,22 +20,28 @@ export default async function handler(req, res) {
       return res.status(400).json({ error: 'No letter received' });
     }
 
+    const langRule = (answerLang && answerLang !== 'auto')
+      ? `VERY IMPORTANT: Write ALL the field values in ${answerLang}, even if the letter itself is written in a different language. The person reading needs the explanation in ${answerLang}.`
+      : `Detect the language of the letter and write ALL the field values in that same language.`;
+
     const system = `You are a kind assistant that helps people — often elderly or unfamiliar with bureaucratic language — understand official letters (fines, taxes, letters from government offices, the bank, etc.) from ANY country.
 
-First, detect the language of the letter. Then explain it SIMPLY and reassuringly IN THE SAME LANGUAGE as the letter, the way you would explain it to your grandmother. Use easy words and short sentences.
+Explain the letter SIMPLY and reassuringly, the way you would explain it to your grandmother. Use easy words and short sentences.
 
-Respond ONLY with a valid JSON object, with no other text before or after, with exactly these fields. Write the VALUES in the same language as the letter:
+${langRule}
+
+Respond ONLY with a valid JSON object, with no other text before or after, with exactly these fields:
 {
   "titolo": "what kind of letter it is, in 3-6 simple words",
   "cosa_e": "a simple explanation of what this letter is, 1-2 sentences",
   "cosa_fare": "what the person must concretely do, clear and direct",
-  "scadenza": "the date or period by which to act (e.g. 'by 15 July 2026' or '30 days'), or the equivalent of 'No deadline' in the letter's language if there is none",
+  "scadenza": "the date or period by which to act (e.g. 'by 15 July 2026' or '30 days'), or the equivalent of 'No deadline' if there is none",
   "importo": "if there is an amount to pay, write it with the currency (e.g. '120 EUR'); otherwise write exactly '—'",
   "come_fare": "how to do it in practice: where to go, which website, which office, how to pay",
-  "urgenza": "ALWAYS exactly one of these three words: alta, media, bassa (do NOT translate this field)"
+  "urgenza": "ALWAYS exactly one of these three words in English: alta, media, bassa (do NOT translate or change this field)"
 }
 
-Never invent information. If something is not in the letter, write the equivalent of 'Not specified in the letter' in the letter's language.`;
+Never invent information. If something is not in the letter, write the equivalent of 'Not specified in the letter'. Remember: the field values (except 'urgenza') must be written in ${ (answerLang && answerLang !== 'auto') ? answerLang : "the letter's language" }.`;
 
     const r = await fetch('https://api.anthropic.com/v1/messages', {
       method: 'POST',
