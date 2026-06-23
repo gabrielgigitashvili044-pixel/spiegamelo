@@ -5,8 +5,8 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 <title>Spiegamelo</title>
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 44 44'%3E%3Crect width='44' height='44' rx='12' fill='%23FFE01B'/%3E%3Cpath d='M8 15.5L22 24L36 15.5' stroke='%2327241D' stroke-width='2.6' stroke-linecap='round' stroke-linejoin='round'/%3E%3Crect x='8' y='13' width='28' height='19' rx='3' stroke='%2327241D' stroke-width='2.6' fill='none'/%3E%3Ccircle cx='31' cy='14' r='7' fill='%232F9E68'/%3E%3Cpath d='M28 14L30 16.5L34.5 11.5' stroke='white' stroke-width='2.2' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E" />
-<meta property="og:title" content="Spiegamelo — Understand any official letter" />
-<meta property="og:description" content="Take a photo of an official letter and we'll tell you what it is and what to do." />
+<meta property="og:title" content="Spiegamelo — Capisci ogni lettera ufficiale" />
+<meta property="og:description" content="Fai una foto a una lettera ufficiale e ti spieghiamo cos'è e cosa devi fare." />
 <meta property="og:type" content="website" />
 <meta property="og:url" content="https://spiegamelo.vercel.app/" />
 <meta property="og:image" content="https://spiegamelo.vercel.app/spiegamelo-link-preview.png" />
@@ -38,11 +38,13 @@
   .langpick{display:flex;align-items:center;justify-content:center;gap:9px;margin-bottom:22px;flex-wrap:wrap}
   .langpick label{font-size:15px;color:var(--muted);font-weight:600}
   .langpick select{font-family:'Manrope',sans-serif;font-size:16px;font-weight:600;color:var(--ink);background:#FFFBEC;border:1.5px solid var(--line);border-radius:12px;padding:11px 14px;cursor:pointer;max-width:240px}
-  .btn{display:inline-flex;align-items:center;justify-content:center;gap:10px;background:var(--yellow);color:var(--ink);border:none;border-radius:16px;font-family:'Manrope',sans-serif;font-weight:700;font-size:20px;padding:18px 30px;cursor:pointer;width:100%;max-width:340px;transition:.15s;box-shadow:0 4px 0 var(--yellow-deep)}
+  .btn{display:inline-flex;align-items:center;justify-content:center;gap:10px;background:var(--yellow);color:var(--ink);border:none;border-radius:16px;font-family:'Manrope',sans-serif;font-weight:700;font-size:20px;padding:18px 30px;cursor:pointer;width:100%;max-width:360px;transition:.15s;box-shadow:0 4px 0 var(--yellow-deep)}
   .btn:hover{transform:translateY(-1px)}
   .btn:active{transform:translateY(3px);box-shadow:0 1px 0 var(--yellow-deep)}
-  .btn.ghost{background:transparent;box-shadow:none;color:var(--muted);font-weight:600;font-size:16px;text-decoration:underline;padding:12px;margin-top:6px}
-  .hint{color:var(--muted);font-size:15px;margin-top:14px}
+  .btn.soft{background:#FFFBEC;color:var(--ink);box-shadow:none;border:1.6px solid var(--line);margin-top:12px}
+  .btn.soft:active{transform:translateY(1px);box-shadow:none}
+  .btn.ghost{background:transparent;box-shadow:none;color:var(--muted);font-weight:600;font-size:16px;text-decoration:underline;padding:12px;margin-top:8px;width:auto}
+  .hint{color:var(--muted);font-size:15px;margin-top:16px}
   textarea{width:100%;min-height:150px;border:1.5px solid var(--line);border-radius:14px;padding:14px;font-family:'Manrope',sans-serif;font-size:17px;color:var(--ink);resize:vertical;margin-bottom:14px}
   .hidden{display:none}
   .steps{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin:34px 0 10px}
@@ -114,9 +116,11 @@
             <option value="Polish">Polski</option>
           </select>
         </div>
-        <button class="btn" id="pick" data-i18n="pick"></button>
+        <button class="btn" id="pickCam" data-i18n="pickCam"></button>
+        <button class="btn soft" id="pickGal" data-i18n="pickGal"></button>
         <div class="hint" data-i18n="hint"></div>
-        <input type="file" id="file" accept="image/*" capture="environment" class="hidden" />
+        <input type="file" id="fileCam" accept="image/*" capture="environment" class="hidden" />
+        <input type="file" id="fileGal" accept="image/*" class="hidden" />
         <button class="btn ghost" id="toggleText" data-i18n="toggle"></button>
         <div id="textBox" class="hidden" style="margin-top:16px">
           <textarea id="text" data-i18n-ph="ph"></textarea>
@@ -157,7 +161,7 @@
       h1:"Hai ricevuto una lettera che non capisci?",
       sub:"Falle una foto. Ti spieghiamo cos'è, cosa devi fare ed entro quando — in parole semplici.",
       langlabel:"Spiegami in:", autolang:"🌐 Automatico (come la lettera)",
-      pick:"📷 Carica la lettera", hint:"Gratis · Nessuna registrazione · Bastano 10 secondi",
+      pickCam:"📷 Scatta una foto", pickGal:"🖼️ Scegli dalla galleria", hint:"Gratis · Nessuna registrazione · Bastano 10 secondi",
       toggle:"oppure scrivi il testo a mano", ph:"Scrivi qui cosa dice la lettera...", send:"Spiegamela",
       s1t:"1. Fai una foto", s1s:"alla tua lettera", s2t:"2. La leggiamo", s2s:"noi per te", s3t:"3. Ti diciamo", s3s:"cosa devi fare",
       loadt:"Sto leggendo la tua lettera...", loads:"Un momento di pazienza",
@@ -166,35 +170,23 @@
       disc:"Spiegamelo ti aiuta a capire la tua lettera, ma non sostituisce un consiglio legale o fiscale ufficiale. In caso di dubbio, rivolgiti a un professionista o all'ufficio competente.",
       foot:"Fatto con cura · Spiegamelo",
       urg:{alta:"⚠️ Urgente",media:"🟡 Importante",bassa:"🟢 Nessuna fretta"},
-      err:{photo:"Non riesco a leggere la foto. Riprova.",short:"Scrivi qualche parola in più.",wrong:"Qualcosa è andato storto. Riprova tra poco.",noread:"Non sono riuscito a leggere la lettera. Prova con una foto più chiara.",conn:"Connessione assente. Controlla internet e riprova."} },
-    en:{ title:"Spiegamelo — Understand any official letter",
-      h1:"Got a letter you don't understand?",
-      sub:"Take a photo. We'll tell you what it is, what to do, and by when — in plain words.",
-      langlabel:"Explain it in:", autolang:"🌐 Automatic (same as letter)",
-      pick:"📷 Upload your letter", hint:"Free · No sign-up · Takes 10 seconds",
-      toggle:"or type the text instead", ph:"Type what the letter says here...", send:"Explain it",
-      s1t:"1. Take a photo", s1s:"of your letter", s2t:"2. We read it", s2s:"for you", s3t:"3. We tell you", s3s:"what to do",
-      loadt:"Reading your letter...", loads:"Just a moment",
-      labWhat:"📄 What this letter is", labDo:"✅ What to do", labAmount:"💶 Amount to pay", labWhen:"⏰ By when", labHow:"📍 How to do it",
-      reset:"📷 Upload another letter",
-      disc:"Spiegamelo helps you understand your letter, but it is not official legal or tax advice. When in doubt, ask a professional or the relevant office.",
-      foot:"Made with care · Spiegamelo",
-      urg:{alta:"⚠️ Urgent",media:"🟡 Important",bassa:"🟢 No rush"},
-      err:{photo:"Couldn't read the photo. Please try again.",short:"Please type a few more words.",wrong:"Something went wrong. Please try again shortly.",noread:"Couldn't read the letter. Try a clearer photo.",conn:"No connection. Check your internet and try again."} }
+      err:{photo:"Non riesco a leggere la foto. Riprova.",short:"Scrivi qualche parola in più.",wrong:"Qualcosa è andato storto. Riprova tra poco.",noread:"Non sono riuscito a leggere la lettera. Prova con una foto più chiara.",conn:"Connessione assente. Controlla internet e riprova."} }
   };
-  const lang = (navigator.language||'en').toLowerCase().startsWith('it') ? 'it' : 'en';
-  const t = T[lang];
-  document.documentElement.lang = lang;
+  const t = T.it;
+  document.documentElement.lang = 'it';
   document.title = t.title;
   document.querySelectorAll('[data-i18n]').forEach(el=>{ const k=el.dataset.i18n; if(t[k]!=null) el.textContent=t[k]; });
   document.querySelectorAll('[data-i18n-ph]').forEach(el=>{ const k=el.dataset.i18nPh; if(t[k]!=null) el.placeholder=t[k]; });
 
   const $ = id => document.getElementById(id);
   const show = (...ids) => { ['start','loader','out'].forEach(s=>$(s).classList.add('hidden')); ids.forEach(i=>$(i).classList.remove('hidden')); };
-  $('pick').onclick = () => $('file').click();
+  $('pickCam').onclick = () => $('fileCam').click();
+  $('pickGal').onclick = () => $('fileGal').click();
   $('toggleText').onclick = () => $('textBox').classList.toggle('hidden');
-  $('reset').onclick = () => { $('file').value=''; $('text').value=''; $('error').innerHTML=''; show('start'); };
-  $('file').onchange = async e => { const f=e.target.files[0]; if(!f) return; try{ const b64=await resize(f); analyze({image:b64,mediaType:'image/jpeg'}); }catch(err){ fail(t.err.photo); } };
+  $('reset').onclick = () => { $('fileCam').value=''; $('fileGal').value=''; $('text').value=''; $('error').innerHTML=''; show('start'); };
+  const onFile = async e => { const f=e.target.files[0]; if(!f) return; try{ const b64=await resize(f); analyze({image:b64,mediaType:'image/jpeg'}); }catch(err){ fail(t.err.photo); } };
+  $('fileCam').onchange = onFile;
+  $('fileGal').onchange = onFile;
   $('sendText').onclick = () => { const x=$('text').value.trim(); if(x.length<5){ fail(t.err.short); return; } analyze({text:x}); };
   function resize(file){ return new Promise((res,rej)=>{ const img=new Image(); img.onload=()=>{ const max=1568; let w=img.width,h=img.height; if(w>h&&w>max){h=h*max/w;w=max;} else if(h>max){w=w*max/h;h=max;} const c=document.createElement('canvas'); c.width=w; c.height=h; c.getContext('2d').drawImage(img,0,0,w,h); res(c.toDataURL('image/jpeg',0.85).split(',')[1]); }; img.onerror=rej; const fr=new FileReader(); fr.onload=()=>img.src=fr.result; fr.onerror=rej; fr.readAsDataURL(file); }); }
   function fail(msg){ $('error').innerHTML='<div class="err">'+msg+'</div>'; show('start'); }
